@@ -1,0 +1,74 @@
+{% load rest_framework %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <title>Article Details</title>
+</head>
+<body>
+    
+<h1>Profile - {{ article.name }}</h1>
+
+<form id="articleForm" action="{% url 'ArticleList_detail' pk=article.pk %}" method="POST">
+    {% csrf_token %}
+    {% render_form serializer %}
+    <input type="submit" value="Save">
+</form>
+
+<!-- PUT method button -->
+<button onclick="updateArticle()">Update</button>
+
+<!-- DELETE method button -->
+<button onclick="deleteArticle()">Delete</button>
+
+<script>
+    function updateArticle() {
+        fetch("{% url 'ArticleList_detail' pk=article.pk %}", {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                // Your updated data here
+            })
+        }).then(response => {
+            if (response.ok) {
+                // Handle successful update
+                console.log("Article updated successfully");
+            } else {
+                // Handle update failure
+                console.error("Failed to update article");
+            }
+        }).catch(error => {
+            console.error("Error:", error);
+        });
+    }
+
+    function deleteArticle() {
+        if (confirm("Are you sure you want to delete this article?")) {
+            fetch("{% url 'ArticleList_detail' pk=article.pk %}", {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    // Handle successful deletion
+                    console.log("Article deleted successfully");
+                    // Redirect or perform any necessary action after deletion
+                } else {
+                    // Handle deletion failure
+                    console.error("Failed to delete article");
+                }
+            }).catch(error => {
+                console.error("Error:", error);
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
